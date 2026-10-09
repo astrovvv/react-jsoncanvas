@@ -1,6 +1,6 @@
 {
   "name": "@astrov/react-jsoncanvas",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "React implementation of JSONCanvas renderer with interactive features",
   "homepage": "https://github.com/astrovvv/react-jsoncanvas#readme",
   "repository": {
