@@ -1,0 +1,148 @@
+/* Obsidian Canvas 1.13.7 control styling. */
+.react-jsoncanvas-zoom-controls,
+.react-jsoncanvas-viewport-controls,
+.react-jsoncanvas-export-controls {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--canvas-control-border);
+  border-radius: var(--canvas-control-border-radius);
+  background: var(--canvas-control-background);
+  box-shadow: var(--canvas-control-shadow);
+  font-size: var(--font-ui-medium, 15px);
+}
+
+.react-jsoncanvas-theme-toggle {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  z-index: 5;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--canvas-control-border);
+  border-radius: var(--canvas-control-border-radius);
+  color: var(--text-muted, #5c5c5c);
+  background: var(--canvas-control-background);
+  box-shadow: var(--canvas-control-shadow);
+  cursor: pointer;
+  place-items: center;
+}
+
+.react-jsoncanvas-theme-toggle:hover {
+  color: var(--text-normal, #222222);
+  background: var(--interactive-hover, #fafafa);
+}
+
+.react-jsoncanvas-zoom-controls button,
+.react-jsoncanvas-viewport-controls button,
+.react-jsoncanvas-export-controls button {
+  display: flex;
+  min-width: 32px;
+  height: auto;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border: 0;
+  border-bottom: 1px solid var(--background-modifier-border, #e4e4e4);
+  border-radius: 0;
+  color: var(--text-muted, #5c5c5c);
+  background: var(--background-primary, #ffffff);
+  box-shadow: none;
+  font: inherit;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.react-jsoncanvas-zoom-controls button:last-child,
+.react-jsoncanvas-viewport-controls button:last-child,
+.react-jsoncanvas-export-controls > button:last-of-type {
+  border-bottom: 0;
+}
+
+.react-jsoncanvas-zoom-controls button:hover:not(:disabled),
+.react-jsoncanvas-viewport-controls button:hover,
+.react-jsoncanvas-export-controls > button:hover {
+  color: var(--text-normal, #222222);
+  background: var(--interactive-hover, #fafafa);
+}
+
+.react-jsoncanvas-zoom-controls button:active,
+.react-jsoncanvas-viewport-controls button:active,
+.react-jsoncanvas-export-controls > button:active {
+  color: var(--color-accent, hsl(258, 88%, 66%));
+}
+
+.react-jsoncanvas-zoom-controls button:disabled {
+  color: var(--text-faint, #ababab);
+  cursor: not-allowed;
+}
+
+.react-jsoncanvas-zoom-level {
+  display: flex;
+  min-width: 50px;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-bottom: 1px solid var(--background-modifier-border, #e4e4e4);
+  color: var(--text-muted, #5c5c5c);
+  background: var(--background-primary, #ffffff);
+  font-weight: 500;
+  line-height: 1;
+  text-align: center;
+}
+
+.react-jsoncanvas-export-controls {
+  position: relative;
+  overflow: visible;
+}
+
+.react-jsoncanvas-output-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 1000;
+  width: 400px;
+  max-height: 300px;
+  overflow: hidden;
+  border: 1px solid var(--background-modifier-border, #e4e4e4);
+  border-radius: 4px;
+  color: var(--text-normal, #222222);
+  background: var(--background-primary, #ffffff);
+  box-shadow: var(--canvas-control-shadow);
+}
+
+.react-jsoncanvas-output-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  border-bottom: 1px solid var(--background-modifier-border, #e4e4e4);
+  font-weight: 600;
+}
+
+.react-jsoncanvas-output-header .react-jsoncanvas-close-output {
+  width: 24px;
+  min-width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  font-size: 18px;
+}
+
+.react-jsoncanvas-output {
+  max-height: 200px;
+  margin: 0;
+  padding: 12px;
+  overflow: auto;
+  color: var(--text-normal, #222222);
+  background: var(--background-secondary, #f6f6f6);
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.react-jsoncanvas-output code {
+  font-family: inherit;
+}

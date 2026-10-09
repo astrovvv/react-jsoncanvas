@@ -1,0 +1,74 @@
+@import './canvas.css';
+@import './nodes.css';
+@import './edges.css';
+@import './controls.css';
+
+.react-jsoncanvas,
+.react-jsoncanvas * {
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px), (pointer: coarse) {
+  .react-jsoncanvas {
+    --font-ui-small: calc(var(--font-text-size, 16px) * 0.937);
+    --font-ui-medium: var(--font-text-size, 16px);
+    --font-ui-large: calc(var(--font-text-size, 16px) * 1.2);
+  }
+
+  .react-jsoncanvas-zoom-controls,
+  .react-jsoncanvas-viewport-controls,
+  .react-jsoncanvas-export-controls {
+    border: 0;
+    border-radius: 40px;
+  }
+
+  .react-jsoncanvas-zoom-controls button,
+  .react-jsoncanvas-viewport-controls button,
+  .react-jsoncanvas-export-controls button,
+  .react-jsoncanvas-zoom-level {
+    min-width: 40px;
+    min-height: 40px;
+    border: 0;
+    background: transparent;
+    font-size: var(--font-ui-medium, 16px);
+  }
+
+  .react-jsoncanvas-anchor {
+    opacity: 1;
+  }
+
+  .react-jsoncanvas-output-panel {
+    width: min(300px, calc(100vw - 24px));
+    max-height: 200px;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .react-jsoncanvas {
+    --canvas-color-neutral: CanvasText;
+    --canvas-control-border: CanvasText;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .react-jsoncanvas-node,
+  .react-jsoncanvas-edge-path,
+  .react-jsoncanvas-edge-highlight,
+  .react-jsoncanvas-anchor,
+  .react-jsoncanvas-edge-arrow-shape,
+  .react-jsoncanvas button {
+    transition: none;
+  }
+}
+
+@media print {
+  .react-jsoncanvas-zoom-controls,
+  .react-jsoncanvas-viewport-controls,
+  .react-jsoncanvas-export-controls {
+    display: none;
+  }
+
+  .react-jsoncanvas-container {
+    overflow: visible;
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "declaration": false,
+    "declarationMap": false
+  },
+  "include": ["app.tsx", "example/**/*", "src/**/*"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "example-dist",
+    "**/*.test.*",
+    "**/*.spec.*"
+  ]
+}

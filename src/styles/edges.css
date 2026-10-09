@@ -1,0 +1,187 @@
+/* Obsidian Canvas 1.13.7 edge styling. */
+.react-jsoncanvas-edges-layer,
+.react-jsoncanvas-edges-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.react-jsoncanvas-edge,
+.react-jsoncanvas-edge-visual {
+  pointer-events: initial;
+}
+
+.react-jsoncanvas-arrows-svg,
+.react-jsoncanvas-arrows-svg * {
+  pointer-events: none;
+}
+
+.react-jsoncanvas-edge-path {
+  fill: none;
+  stroke: var(--canvas-color);
+  stroke-width: var(--edge-stroke-width, 2px);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke-width 100ms ease-out;
+  pointer-events: none;
+}
+
+.react-jsoncanvas-edge-highlight {
+  fill: none;
+  stroke: color-mix(in oklch, var(--canvas-color) 10%, transparent);
+  stroke-width: var(--edge-hit-width, 24px);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+.react-jsoncanvas-edge--hovered .react-jsoncanvas-edge-path,
+.react-jsoncanvas-edge--selected .react-jsoncanvas-edge-path {
+  stroke-width: var(--edge-hover-width, 5.5px);
+}
+
+.react-jsoncanvas-connecting
+  .react-jsoncanvas-edge--hovered
+  .react-jsoncanvas-edge-path {
+  stroke-width: var(--edge-stroke-width, 2px);
+}
+
+.react-jsoncanvas-edge-arrow-shape {
+  pointer-events: none;
+  fill: var(--canvas-color);
+  stroke: var(--canvas-color);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1px;
+  transform-box: fill-box;
+  transform: scale(var(--edge-arrow-scale-x, 1), var(--edge-arrow-scale-y, 1));
+  transform-origin: center top;
+}
+
+.react-jsoncanvas-edge-preview {
+  pointer-events: none;
+}
+
+.react-jsoncanvas-edge-label-wrapper {
+  overflow: visible;
+  pointer-events: none;
+}
+
+.react-jsoncanvas-edge-label {
+  position: absolute;
+  width: max-content;
+  max-width: calc(17em * var(--edge-zoom-multiplier, 1));
+  padding: calc(6px * var(--edge-zoom-multiplier, 1));
+  border-radius: calc(4px * var(--edge-zoom-multiplier, 1));
+  color: var(--text-normal, #222222);
+  background: var(--background-primary, #ffffff);
+  font-size: calc(20px * var(--edge-zoom-multiplier, 1));
+  line-height: 1.3;
+  text-align: center;
+  white-space: pre-wrap;
+  transform: translate(-50%, -50%);
+}
+
+.react-jsoncanvas-edge-editor {
+  position: absolute;
+  z-index: 1000;
+  transform: translate(-50%, calc(-100% - 10px))
+    scale(var(--edge-editor-inverse-scale));
+  transform-origin: center bottom;
+  pointer-events: auto;
+}
+
+.react-jsoncanvas-edge-editor--editing {
+  transform: translate(-50%, -50%) scale(var(--edge-editor-inverse-scale));
+  transform-origin: center;
+}
+
+.react-jsoncanvas-edge-toolbar,
+.react-jsoncanvas-edge-palette {
+  display: flex;
+  flex-direction: row;
+  gap: 1px;
+  border: 1px solid var(--background-modifier-border, #e4e4e4);
+  border-radius: 4px;
+  background: var(--background-primary, #ffffff);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+}
+
+.react-jsoncanvas-edge-toolbar {
+  position: relative;
+  padding: 2px;
+  line-height: 1;
+}
+
+.react-jsoncanvas-edge-toolbar > button {
+  display: grid;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 4px;
+  color: var(--text-muted, #5c5c5c);
+  background: transparent;
+  cursor: pointer;
+  place-items: center;
+}
+
+.react-jsoncanvas-edge-toolbar > button:hover,
+.react-jsoncanvas-edge-toolbar > button[aria-expanded='true'] {
+  color: var(--color-accent, hsl(258, 88%, 66%));
+  background: var(--interactive-hover, #fafafa);
+}
+
+.react-jsoncanvas-edge-toolbar svg {
+  width: 16px;
+  height: 16px;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.react-jsoncanvas-edge-palette {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 50%;
+  padding: 8px;
+  overflow: hidden;
+  transform: translateX(-50%);
+}
+
+.react-jsoncanvas-edge-palette .react-jsoncanvas-edge-color {
+  width: 24px;
+  height: 24px;
+  margin: 2px;
+  padding: 0;
+  border: 2px solid var(--background-primary, #ffffff);
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.react-jsoncanvas-edge-palette .react-jsoncanvas-edge-color:hover,
+.react-jsoncanvas-edge-palette
+  .react-jsoncanvas-edge-color[aria-pressed='true'] {
+  box-shadow: 0 0 0 2px currentColor;
+}
+
+.react-jsoncanvas-edge-label-input {
+  width: min(17em, 340px);
+  padding: 6px;
+  border: 1px solid var(--canvas-color);
+  border-radius: 4px;
+  outline: none;
+  color: var(--text-normal, #222222);
+  background: var(--background-primary, #ffffff);
+  box-shadow:
+    var(--canvas-node-shadow),
+    0 0 0 3px var(--canvas-color);
+  font: inherit;
+  font-size: 20px;
+  line-height: 1.3;
+  text-align: center;
+}
