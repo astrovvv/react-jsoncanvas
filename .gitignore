@@ -46,3 +46,6 @@ coverage
 
 # Prettier cache
 .prettiercache
+
+# Local project notes (not part of the repository)
+/.local-docs/
