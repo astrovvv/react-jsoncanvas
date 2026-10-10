@@ -6,23 +6,43 @@
 [![Minified + gzip](https://img.shields.io/bundlephobia/minzip/%40astrov%2Freact-jsoncanvas)](https://bundlephobia.com/package/@astrov/react-jsoncanvas)
 [![License: MIT](https://img.shields.io/github/license/astrovvv/react-jsoncanvas)](./LICENSE)
 
-A React implementation of the JSONCanvas format renderer with interactive features including zoom, pan, drag-and-drop, and touch support.
+An interactive React canvas for text, links, groups, and custom nodes, using
+the JSON Canvas document structure.
 
 ## Features
 
-- 🎨 **Full JSONCanvas Support** - Renders text, link, and group nodes with edges
-- 🔍 **Interactive Zoom & Pan** - Mouse wheel zoom, keyboard shortcuts, touch gestures
-- 🖱️ **Drag & Drop** - Move nodes around the canvas with mouse or touch
+- 🎨 **Built-in Nodes** - Text, link, and group nodes with connecting edges
+- 🔍 **Interactive Zoom & Pan** - Ctrl/Cmd + wheel zoom, keyboard shortcuts, touch pan and pinch zoom
+- 🖱️ **Drag & Drop** - Move nodes around the canvas with a mouse
 - 🧭 **Selection & Editing** - Marquee and multi-selection, resize, copy/paste, and delete
 - ↩️ **History** - Undo and redo editor mutations
 - 🗂️ **Deterministic Layers** - Persistent node ordering with undoable z-order commands
 - 🔗 **Edge Editing** - Select, label, recolor, delete, create, and rewire connections
 - ⚡ **Viewport Culling** - Skips off-screen nodes and edges on larger canvases
-- 📱 **Touch Support** - Full mobile and tablet support with gestures
 - ⌨️ **Keyboard Shortcuts** - Space for panning, Ctrl+scroll for zoom
-- 🎯 **TypeScript** - Fully typed with comprehensive type definitions
-- 🎛️ **Customizable** - Configurable colors, styles, and behavior
-- 📦 **Lightweight** - Minimal dependencies, optimized bundle size
+- 🎯 **TypeScript** - Included type declarations
+- 🎛️ **Custom Nodes** - Register your own React components with `nodeRenderers`
+
+## JSON Canvas compatibility
+
+The library supports part of the [JSON Canvas 1.0 specification](https://jsoncanvas.org/spec/1.0/).
+Built-in renderers cover `text`, `link`, and `group` nodes. Current limitations:
+
+- There is no built-in `file` renderer. Register one through `nodeRenderers`
+  to display images, attachments, or other file content; your application must
+  resolve file paths and subpaths.
+- The built-in text renderer inserts `text` as HTML, without sanitization. It
+  does not parse the specification's Markdown syntax. Use trusted or sanitized
+  content, or register a separate custom node type for your own text renderer.
+- Node and edge colors support the six preset values (`"1"`–`"6"`), not hex colors.
+- Edges render an end arrow only when `toEnd: 'arrow'` is explicit. The
+  specification's default end arrow and `fromEnd` arrows are not implemented.
+
+Custom components can add missing node content renderers. The built-in names
+`text`, `link`, and `group` cannot be overridden through `nodeRenderers`; a custom
+Markdown renderer needs its own node type and application-side conversion when
+importing or exporting standard text nodes. Custom node renderers do not change
+Canvas's edge rendering or interaction handling.
 
 ## Installation
 
@@ -32,7 +52,16 @@ npm install @astrov/react-jsoncanvas
 
 ## Interactive examples
 
-Run `npm run dev:example` and open the local Vite page. The sidebar links to
+The gallery lives in this repository, not in the installed npm package. To run it:
+
+```bash
+git clone https://github.com/astrovvv/react-jsoncanvas.git
+cd react-jsoncanvas
+npm ci
+npm run dev:example
+```
+
+Open the local URL printed by Vite. The sidebar links to
 separate scenes for text, links, custom nodes, all six node colors, groups and
 background styles, edge anchors and endings, optional controls, a 1200-node
 document with automatic panning, and three other animated performance scenarios.
@@ -44,8 +73,11 @@ Run `npm run build:example` to build the same gallery for deployment.
 
 ```tsx
 import React from 'react';
-import { Canvas } from '@astrov/react-jsoncanvas';
-import { GenericNode, Edge } from '@trbn/jsoncanvas';
+import {
+  Canvas,
+  type GenericNode,
+  type JSONCanvasEdge,
+} from '@astrov/react-jsoncanvas';
 import '@astrov/react-jsoncanvas/styles';
 
 const nodes: GenericNode[] = [
@@ -69,11 +101,13 @@ const nodes: GenericNode[] = [
   },
 ];
 
-const edges: Edge[] = [
+const edges: JSONCanvasEdge[] = [
   {
     id: 'edge1',
     fromNode: 'node1',
+    fromSide: 'right',
     toNode: 'node2',
+    toSide: 'left',
     toEnd: 'arrow',
   },
 ];
@@ -107,16 +141,19 @@ Components rendered inside `Canvas` can use the layer commands from
 ```tsx
 import { useCanvas } from '@astrov/react-jsoncanvas';
 
-const {
-  state,
-  bringNodesToFront,
-  bringNodesForward,
-  sendNodesBackward,
-  sendNodesToBack,
-} = useCanvas();
+function BringForwardButton() {
+  const { state, bringNodesForward } = useCanvas();
 
-bringNodesForward(state.selectedNodeIds);
+  return (
+    <button onClick={() => bringNodesForward(state.selectedNodeIds)}>
+      Bring forward
+    </button>
+  );
+}
 ```
+
+Other layer commands are `bringNodesToFront`, `sendNodesBackward`, and
+`sendNodesToBack`; each accepts an array of node IDs.
 
 Edges remain below nodes. Within the edge SVG, connections follow the layer of
 their highest endpoint, and connections to selected nodes render last.
@@ -251,7 +288,7 @@ import {
 function App() {
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
-        <Canvas nodes={nodes} edges={edges}>
+      <Canvas nodes={nodes} edges={edges}>
         {/* Controls positioned absolutely */}
         <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 10 }}>
           <ZoomControls showLabels />
@@ -288,15 +325,15 @@ theme. Controls remain optional children of `Canvas`.
 
 ```tsx
 import React from 'react';
-import { Canvas } from '@astrov/react-jsoncanvas';
+import { Canvas, type Point, type ViewportState } from '@astrov/react-jsoncanvas';
 
 function App() {
-  const handleNodeMove = (nodeId: string, position: { x: number; y: number }) => {
+  const handleNodeMove = (nodeId: string, position: Point) => {
     console.log(`Node ${nodeId} moved to`, position);
   };
 
-  const handleNodeSelect = (nodeId: string | null) => {
-    console.log('Selected node:', nodeId);
+  const handleNodeSelect = (nodeId: string | null, nodeIds?: string[]) => {
+    console.log('Selected node:', nodeId, 'Selection:', nodeIds);
   };
 
   const handleViewportChange = (viewport: ViewportState) => {
@@ -344,19 +381,26 @@ function App() {
 
 ### Canvas Component
 
+`nodes` and `edges` are required. All other props are optional. `JSONCanvasEdge`
+is the exported edge data type; `Edge` is the React component.
+
 | Prop | Type | Description |
 |------|------|-------------|
 | `nodes` | `GenericNode[]` | Initial nodes; changes after mount are not synchronized |
-| `edges` | `Edge[]` | Initial edges; changes after mount are not synchronized |
+| `edges` | `JSONCanvasEdge[]` | Initial edges; changes after mount are not synchronized |
 | `className` | `string` | Additional CSS class |
 | `style` | `React.CSSProperties` | Inline styles |
 | `config` | `Partial<CanvasConfig>` | Configuration options |
 | `nodeRenderers` | `CustomNodeRenderers` | Custom content renderers keyed by node type |
+| `theme` | `'light' \| 'dark'` | Sets the theme; the optional toggle can change it. When omitted, no explicit theme is applied |
+| `showThemeToggle` | `boolean` | Shows a theme button; defaults to `false` |
+| `onThemeChange` | `(theme: 'light' \| 'dark') => void` | Called when the theme button is used |
+| `children` | `React.ReactNode` | Controls or other components rendered inside the Canvas provider |
 | `onNodeMove` | `(nodeId: string, position: Point) => void` | Called when a node is moved |
-| `onNodeSelect` | `(nodeId: string \| null) => void` | Called when a node is selected |
+| `onNodeSelect` | `(nodeId: string \| null, nodeIds?: string[]) => void` | Reports the selected node and, when supplied, the full selection |
 | `onViewportChange` | `(viewport: ViewportState) => void` | Called when viewport changes |
-| `onCanvasChange` | `(nodes: GenericNode[], edges: Edge[]) => void` | Called when canvas data changes |
-| `onEdgeCreate` | `(edge: Edge) => void` | Called when an edge is created |
+| `onCanvasChange` | `(nodes: GenericNode[], edges: JSONCanvasEdge[]) => void` | Reports document changes; use it to persist editor data |
+| `onEdgeCreate` | `(edge: JSONCanvasEdge) => void` | Called when an edge is created |
 | `onConnectDrop` | `(event: ConnectDropEvent) => GenericNode \| null \| undefined` | Creates and connects a node when an edge is dropped on empty space |
 
 ### Configuration Options
@@ -366,20 +410,25 @@ interface CanvasConfig {
   minScale: number;           // Minimum zoom level (default: 0.25)
   maxScale: number;           // Maximum zoom level (default: 3)
   zoomSpeed: number;          // Zoom step size (default: 0.3)
-  touchThreshold: number;     // Touch drag threshold (default: 10)
+  touchThreshold: number;     // Touch drag activation threshold; movement is not yet implemented (default: 10)
   curveTightness: number;     // Edge curve tightness (default: 0.75)
   enableKeyboardShortcuts: boolean; // Enable keyboard shortcuts (default: true)
-  enableTouch: boolean;       // Enable touch support (default: true)
-  snapToGrid: boolean;        // Snap node changes to the grid (default: true)
+  enableTouch: boolean;       // Enable current touch handlers: pan, pinch, node selection (default: true)
+  snapToGrid: boolean;        // Snap mouse drag and resize to the grid (default: true)
   gridSize: number;           // Grid step in world units (default: 20)
 }
 ```
 
 ### Control Components
 
-- `ZoomControls` - Zoom in/out buttons with current zoom level
-- `ViewportControls` - Fit to screen, reset zoom, reset viewport buttons  
-- `ExportControls` - Export canvas data as JSON
+All three controls accept `className?: string` and `showLabels?: boolean`
+(`false` by default) and must be rendered inside `Canvas` or `CanvasProvider`.
+
+| Component | Actions | Additional props |
+|-----------|---------|------------------|
+| `ZoomControls` | Zoom in/out; click the percentage to reset zoom to 100% | `showZoomIn`, `showZoomOut` (both default to `true`) |
+| `ViewportControls` | Fit currently rendered nodes to the viewport; reset scale to 1 and pan offsets to 0 | `showFitToScreen`, `showResetView` (both default to `true`) |
+| `ExportControls` | Show JSON, copy JSON to the system clipboard, download JSON | `showJson`, `showCopy`, `showDownload` (all default to `true`); `filename` (default: `'canvas.json'`) |
 
 ## Keyboard Shortcuts
 
@@ -393,40 +442,24 @@ interface CanvasConfig {
 - **Ctrl/Cmd + C / V / D** - Copy, paste, or duplicate selected nodes
 - **Delete / Backspace** - Delete selected nodes or the selected edge
 
+Node copy/paste uses an internal clipboard for each Canvas instance, not the
+system clipboard. `ExportControls` can copy the document JSON to the system
+clipboard separately.
+
 ## Touch Gestures
 
-- **Single finger drag** - Pan around the canvas
+- **Single finger drag on the background** - Pan around the canvas
 - **Pinch** - Zoom in/out
-- **Tap and drag node** - Move nodes around
+- **Tap a node** - Select it
 
-## Styling
-
-The library includes default styles, but you can customize the appearance using CSS custom properties:
-
-```css
-:root {
-  /* Node colors */
-  --canvas-color-red: #ff6b6b;
-  --canvas-color-orange: #ffa726;
-  --canvas-color-yellow: #ffeb3b;
-  --canvas-color-green: #66bb6a;
-  --canvas-color-cyan: #26c6da;
-  --canvas-color-purple: #ab47bc;
-  
-  /* Edge styles */
-  --canvas-edge-color: #000000;
-  --canvas-edge-width: 2;
-  
-  /* Node styles */
-  --canvas-node-border-radius: 8px;
-  --canvas-node-background: #ffffff;
-  --canvas-node-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-```
+Touch node dragging, resizing, and connection editing are not implemented.
+These gestures do not provide the full desktop editing experience.
 
 ## TypeScript Support
 
-This library is written in TypeScript and provides comprehensive type definitions. All JSONCanvas types are re-exported for convenience:
+The package includes TypeScript declarations and re-exports selected JSON Canvas
+types, including `GenericNode`, `JSONCanvasEdge`, `EdgeSide`, `EdgeEnd`,
+`JSONCanvasTextNode`, `JSONCanvasLinkNode`, and `JSONCanvasGroupNode`:
 
 ```typescript
 import type {
@@ -444,11 +477,3 @@ MIT
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
-
-
-## Planned work
-
-- render node header
-- edge style improvements
-- overall style enhancements
-- smooth LERP zoom
